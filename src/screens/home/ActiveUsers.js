@@ -10,12 +10,19 @@ import {
   Typography,
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { useRecoilValue } from "recoil";
-
-import { usersState } from "../../recoil/atoms/usersState";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+// recoil state
+import activeUsersState from "../../recoil/selectors/activeUsersState";
+import { editUserState } from "../../recoil/atoms/editUserState";
 
 const ActiveUsers = () => {
-  const users = useRecoilValue(usersState);
+  const activeUsers = useRecoilValue(activeUsersState);
+
+  const setEditUser = useSetRecoilState(editUserState);
+
+  const handleOnClickEditBtn = (user) => {
+    setEditUser(user);
+  };
 
   return (
     <Table>
@@ -35,39 +42,37 @@ const ActiveUsers = () => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {users
-          ?.filter((user) => user.status === "active")
-          .map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>
-                <Typography>{user.username}</Typography>
-                <Typography variant="caption" letterSpacing={1}>
-                  {user.email}
-                </Typography>
-              </TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell align="center">
-                <Badge
-                  badgeContent={user.status}
-                  color="primary"
-                  sx={{
-                    textTransform: "capitalize",
-                    ".MuiBadge-badge": { fontWeight: 700 },
-                  }}
-                />
-              </TableCell>
-              <TableCell>
-                <IconButton>
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-              <TableCell>
-                <IconButton>
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+        {activeUsers.map((user) => (
+          <TableRow key={user.id}>
+            <TableCell>
+              <Typography>{user.username}</Typography>
+              <Typography variant="caption" letterSpacing={1}>
+                {user.email}
+              </Typography>
+            </TableCell>
+            <TableCell>{user.role}</TableCell>
+            <TableCell align="center">
+              <Badge
+                badgeContent={user.status}
+                color="primary"
+                sx={{
+                  textTransform: "capitalize",
+                  ".MuiBadge-badge": { fontWeight: 700 },
+                }}
+              />
+            </TableCell>
+            <TableCell>
+              <IconButton onClick={() => handleOnClickEditBtn(user)}>
+                <EditIcon />
+              </IconButton>
+            </TableCell>
+            <TableCell>
+              <IconButton>
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
   Button,
@@ -9,28 +9,27 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
-
+// constants
+import {
+  ACTIVE,
+  INACTIVE,
+  ROLES,
+  initialUser,
+} from "../../constants/constants";
+// recoil state
 import { usersState } from "../../recoil/atoms/usersState";
-import { ACTIVE, INACTIVE, ROLES, USER } from "../../constants/constants";
+import { editUserState } from "../../recoil/atoms/editUserState";
 
-const initialUser = {
-  id: "",
-  username: "",
-  role: USER,
-  email: "",
-  status: ACTIVE,
-};
-
-const AddUser = (props) => {
-  const { id } = props;
-
+const AddUser = () => {
   const [users, setUsers] = useRecoilState(usersState);
 
   const [user, setUser] = useState(initialUser);
 
-  const handleSubmit = () => {
+  const editUser = useRecoilValue(editUserState);
+
+  const createUser = () => {
     if (users.some((ele) => ele.email === user.email)) {
       alert("Email already exist");
     } else {
@@ -39,6 +38,15 @@ const AddUser = (props) => {
       setUser(initialUser);
     }
   };
+
+  const updateUser = () => {
+    setUsers(users.map((ele) => (ele.id === user.id ? user : ele)));
+    setUser(initialUser);
+  };
+
+  useEffect(() => {
+    setUser(editUser);
+  }, [editUser]);
 
   return (
     <Stack spacing={3}>
@@ -50,7 +58,7 @@ const AddUser = (props) => {
         borderBottom={"1px solid #515151"}
         textAlign="center"
       >
-        {id ? "Update" : "Add"} User
+        {user?.id ? "Update" : "Add"} User
       </Typography>
       <TextField
         name="username"
@@ -85,9 +93,15 @@ const AddUser = (props) => {
           label="Inactive"
         />
       </RadioGroup>
-      <Button variant="contained" sx={{ width: 100 }} onClick={handleSubmit}>
-        {id ? "Update" : "Save"}
-      </Button>
+      {user?.id ? (
+        <Button variant="contained" sx={{ width: 100 }} onClick={updateUser}>
+          Update
+        </Button>
+      ) : (
+        <Button variant="contained" sx={{ width: 100 }} onClick={createUser}>
+          Save
+        </Button>
+      )}
     </Stack>
   );
 };
