@@ -9,10 +9,14 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { useRecoilValue } from "recoil";
 
-const ActiveUsers = ({ users }) => {
+import { usersState } from "../../recoil/atoms/usersState";
+
+const ActiveUsers = () => {
+  const users = useRecoilValue(usersState);
+
   return (
     <Table>
       <TableHead>
